@@ -39,7 +39,7 @@ def simplecast_data_collector():
 	start_date = start_date = (datetime.datetime.now() - datetime.timedelta(days_ago)).date()
 
 	print('Getting all podcast download data!')
-	dat = json.loads(getSimplecastResponse(f'/analytics/podcasts?account={account_id}&limit=500')) # Change to 500 for real deal
+	dat = json.loads(getSimplecastResponse(f'/analytics/podcasts?account={account_id}&start_date={start_date}&limit=500')) # Change to 500 for real deal
 	collection = dat['collection']
 	print(collection)
 	df = pd.DataFrame(collection)
@@ -56,23 +56,25 @@ def simplecast_data_collector():
 		# Getting N_episodes
 		pod_title = p['title']
 		pod_id = p['id']
+
+		print('Grabbing episode data...')
 		ep_dat = json.loads(getSimplecastResponse(f'/podcasts/{pod_id}/episodes?&sort=published_at_desc&start_date={start_date}&limit=60'))
 
+		print(f'Counting episodes for {pod_title}')
 		n = 0
 		for e in ep_dat['collection']:
 			
 			days_since_release = e['days_since_release']
-			print(days_since_release)
 			if days_since_release < 31:
-				print('Got an episode')
 				n += 1
 			else:
 				pass
 
-		print(f'# of EPISODES: {n}') 
+		
 		avg = n/4
 		avg_episodes.append(avg)
-		print(f'Average # of episodes per week: {avg_episodes}')
+		print(f'# of EPISODES: {n}') 
+		print(f'Average # of episodes per week: {avg}')
 		print('#################################')
 		print('#################################')
 
